@@ -14,7 +14,6 @@
 """A2A Server that acts as a proxy in front of an ADK agent"""
 
 import base64
-import inspect
 import logging
 from pathlib import Path
 from typing import Dict, Callable, Optional
@@ -207,6 +206,7 @@ class ADKExecutor(AgentExecutor):
             message = types.Content(
                 role="user",
             )
+        # TODO: handle auth responses and long-running tools
         final = False
         stream = self.adk_app.async_stream_query(
             user_id=user_id,
@@ -244,14 +244,6 @@ class ADKExecutor(AgentExecutor):
             function_responses = event_obj.get_function_responses()
             auth_configs = (event_obj.actions.requested_auth_configs
                             if event_obj.actions else None)
-            if auth_configs:
-                from a2a.grpc.a2a_pb2 import AuthenticationInfo
-                for auth in auth_configs:
-                    pass
-                await task_updater.update_status(
-                    state=TaskState.auth_required
-                )
-
             if function_calls or function_responses or auth_configs:
                 if auth_configs or self.transfer_function_calls:
                     await task_updater.add_artifact(
@@ -271,6 +263,7 @@ class ADKExecutor(AgentExecutor):
                         name=f"adk_event_{event_obj.id}.json"
                     )
                 if auth_configs:
+                    # TODO: convert AuthConfig
                     await task_updater.update_status(
                         state=TaskState.auth_required
                     )
