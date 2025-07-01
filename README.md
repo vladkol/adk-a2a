@@ -32,6 +32,10 @@ uv pip install -U -r requirements.txt
 
 ## Usage
 
+1. Copy `.env-sample` file to the same directory as `.env`.
+2. Specify Id of your Google Cloud Project in `GOOGLE_CLOUD_PROJECT` variable.
+The project must have Vertex AI APIs enabled.
+
 To run the sample agent:
 
 ```bash
