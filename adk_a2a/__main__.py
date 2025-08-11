@@ -123,22 +123,11 @@ def _cli_main():
         asyncio.set_event_loop(loop)
         root_agent = loop.run_until_complete(_wait(root_agent))
 
-    host = options.host
-    if (
-        host.lower() == "localhost"
-        or host.startswith("0.0.0.")
-        or host.startswith("127.0.0.")
-    ):
-        schema = "http"
-    else:
-        schema = "https"
-    agent_url = f"{schema}://{host}:{options.port}/"
-
     uvicorn.run(
         adk_as_a2a(
             # Same arguments as in AdkApp class:
             # https://cloud.google.com/python/docs/reference/vertexai/latest/vertexai.preview.reasoning_engines.AdkApp
-            # + `a2a_agent_version` and `agent_url`
+            # plus some A2A
 
             adk_agent=root_agent,
             enable_tracing=True,
@@ -146,10 +135,7 @@ def _cli_main():
             # artifact_service_builder = None,
             # env_vars = None,
             # a2a_agent_version = None,
-            agent_url=agent_url,
-            transfer_function_calls=options.transfer_function_calls,
-            agent_directory=agent_directory
-        ).build(),
+        ),
         host=options.host,
         port=options.port,
         log_level="debug" if options.debug else "info",
